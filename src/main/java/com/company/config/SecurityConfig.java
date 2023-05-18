@@ -36,7 +36,7 @@ public class SecurityConfig {
         return http
                 .authorizeRequests()
 //                .antMatchers("/user/**").hasRole("ADMIN")
-                .antMatchers("/user/**").hasAuthority("ROLE_ADMIN")
+                .antMatchers("/user/**").hasAuthority("Admin")
 //                .antMatchers("/task/**").hasRole("MANAGER")
 //                .antMatchers("/task/employee/**").hasRole("EMPLOYEE")
 //                .antMatchers("/task/**").hasAnyRole("EMPLOYEE","ADMIN")
