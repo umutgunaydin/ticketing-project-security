@@ -11,7 +11,7 @@ import java.util.List;
 
 public class UserPrincipal implements UserDetails {
 
-    private final User user;
+    private User user;
 
     public UserPrincipal(User user) {
         this.user = user;
@@ -21,19 +21,19 @@ public class UserPrincipal implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
         List<GrantedAuthority> authorityList=new ArrayList<>();
-        GrantedAuthority authority=new SimpleGrantedAuthority(user.getRole().getDescription());
+        GrantedAuthority authority=new SimpleGrantedAuthority(this.user.getRole().getDescription());
         authorityList.add(authority);
         return authorityList;
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return this.user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getUserName();
+        return this.user.getUserName();
     }
 
     @Override
@@ -53,6 +53,10 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.isEnabled();
+        return this.user.isEnabled();
+    }
+
+    public Long getId(){
+        return this.user.getId();
     }
 }

@@ -11,7 +11,9 @@ import com.company.repository.ProjectRepository;
 import com.company.service.ProjectService;
 import com.company.service.TaskService;
 import com.company.service.UserService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +25,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final UserService userService;
     private final UserMapper userMapper;
     private final TaskService taskService;
-    public ProjectServiceImpl(ProjectRepository projectRepository, ProjectMapper projectMapper, UserService userService, UserMapper userMapper, TaskService taskService) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, ProjectMapper projectMapper, @Lazy UserService userService, UserMapper userMapper, TaskService taskService) {
         this.projectRepository = projectRepository;
         this.projectMapper = projectMapper;
         this.userService = userService;
@@ -82,8 +84,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<ProjectDTO> listAllProjectDetails() {
 
+        String username= SecurityContextHolder.getContext().getAuthentication().getName(); // brings logged in user infos
 
-        UserDTO currentUserDto=userService.findByUserName("harold@manager.com");
+        UserDTO currentUserDto=userService.findByUserName(username);
         User user=userMapper.convertToEntity(currentUserDto);
 
         List<Project> projectList=projectRepository.findAllByAssignedManager(user);
