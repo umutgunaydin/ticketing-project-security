@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@EntityListeners((BaseEntityListener.class))
+@EntityListeners(BaseEntityListener.class)
 public class BaseEntity {
 
     @Id
