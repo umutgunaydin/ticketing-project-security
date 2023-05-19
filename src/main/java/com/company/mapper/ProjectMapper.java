@@ -1,7 +1,9 @@
 package com.company.mapper;
 
 import com.company.dto.ProjectDTO;
+import com.company.dto.UserDTO;
 import com.company.entity.Project;
+import com.company.entity.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
@@ -15,10 +17,13 @@ public class ProjectMapper {
     }
 
     public Project convertToEntity(ProjectDTO dto){
-        return modelMapper.map(dto, Project.class);
+        return modelMapper.map(dto,Project.class);
+
     }
 
     public ProjectDTO convertToDto(Project entity){
+
         return modelMapper.map(entity,ProjectDTO.class);
     }
+
 }

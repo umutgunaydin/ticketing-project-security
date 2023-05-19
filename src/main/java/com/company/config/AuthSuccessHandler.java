@@ -1,5 +1,6 @@
 package com.company.config;
 
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -13,20 +14,21 @@ import java.util.Set;
 
 @Configuration
 public class AuthSuccessHandler implements AuthenticationSuccessHandler {
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
-        Set<String> roles= AuthorityUtils.authorityListToSet(authentication.getAuthorities());
+        Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
 
-        if (roles.contains("Admin")){
+        if(roles.contains("Admin")){
             response.sendRedirect("/user/create");
         }
 
-        if (roles.contains("Manager")){
+        if(roles.contains("Manager")){
             response.sendRedirect("/task/create");
         }
 
-        if (roles.contains("Employee")){
+        if(roles.contains("Employee")){
             response.sendRedirect("/task/employee/pending-tasks");
         }
 

@@ -1,17 +1,14 @@
 package com.company.mapper;
 
 import com.company.dto.TaskDTO;
-import com.company.dto.UserDTO;
 import com.company.entity.Task;
-import com.company.entity.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 
 @Component
 public class TaskMapper {
 
-    private final ModelMapper modelMapper;
+    private final  ModelMapper modelMapper;
 
     public TaskMapper(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;

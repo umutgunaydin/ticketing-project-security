@@ -18,13 +18,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Service
 public class ProjectServiceImpl implements ProjectService {
+
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
     private final UserService userService;
     private final UserMapper userMapper;
     private final TaskService taskService;
+
     public ProjectServiceImpl(ProjectRepository projectRepository, ProjectMapper projectMapper, @Lazy UserService userService, UserMapper userMapper, TaskService taskService) {
         this.projectRepository = projectRepository;
         this.projectMapper = projectMapper;
@@ -35,75 +38,94 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectDTO getByProjectCode(String code) {
-        return projectMapper.convertToDto(projectRepository.findByProjectCode(code));
+        Project project = projectRepository.findByProjectCode(code);
+        return projectMapper.convertToDto(project);
     }
 
     @Override
     public List<ProjectDTO> listAllProjects() {
-        List<Project> projects=projectRepository.findAll(Sort.by("projectCode"));
-        return projects.stream().map(projectMapper::convertToDto).collect(Collectors.toList());
+
+        List<Project> list = projectRepository.findAll(Sort.by("projectCode"));
+
+        return list.stream().map(projectMapper::convertToDto).collect(Collectors.toList());
     }
 
     @Override
     public void save(ProjectDTO dto) {
+
         dto.setProjectStatus(Status.OPEN);
-        projectRepository.save(projectMapper.convertToEntity(dto));
+        Project project = projectMapper.convertToEntity(dto);
+        projectRepository.save(project);
     }
 
     @Override
     public void update(ProjectDTO dto) {
-        Project project=projectRepository.findByProjectCode(dto.getProjectCode());
-        Project entity=projectMapper.convertToEntity(dto);
-        entity.setId(project.getId());
-        entity.setProjectStatus(project.getProjectStatus());
-        projectRepository.save(entity);
+
+        Project project = projectRepository.findByProjectCode(dto.getProjectCode());
+
+        Project convertedProject = projectMapper.convertToEntity(dto);
+
+        convertedProject.setId(project.getId());
+
+        convertedProject.setProjectStatus(project.getProjectStatus());
+
+        projectRepository.save(convertedProject);
+
+
     }
 
     @Override
     public void delete(String code) {
-        Project project=projectRepository.findByProjectCode(code);
+        Project project = projectRepository.findByProjectCode(code);
         project.setIsDeleted(true);
 
-        project.setProjectCode(project.getProjectCode()+"-"+project.getId());//to use code later
+        project.setProjectCode(project.getProjectCode() + "-" + project.getId());  // SP03-4
 
         projectRepository.save(project);
 
-        taskService.deleteByProject(projectMapper.convertToDto(project)); //to delete related tasks
+        taskService.deleteByProject(projectMapper.convertToDto(project));
+
     }
 
     @Override
     public void complete(String projectCode) {
-        Project project=projectRepository.findByProjectCode(projectCode);
+        Project project = projectRepository.findByProjectCode(projectCode);
         project.setProjectStatus(Status.COMPLETE);
         projectRepository.save(project);
 
-        taskService.completeByProject(projectMapper.convertToDto(project)); //to complete related tasks
-
+        taskService.completeByProject(projectMapper.convertToDto(project));
     }
 
     @Override
     public List<ProjectDTO> listAllProjectDetails() {
 
-        String username= SecurityContextHolder.getContext().getAuthentication().getName(); // brings logged in user infos
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        UserDTO currentUserDto=userService.findByUserName(username);
-        User user=userMapper.convertToEntity(currentUserDto);
+        UserDTO currentUserDTO = userService.findByUserName(username);
 
-        List<Project> projectList=projectRepository.findAllByAssignedManager(user);
+        User user = userMapper.convertToEntity(currentUserDTO);
 
-        return projectList.stream().map(project -> {
-            ProjectDTO dto=projectMapper.convertToDto(project);
-            dto.setCompleteTaskCounts(taskService.totalCompletedTasks(project.getProjectCode()));
-            dto.setUnfinishedTaskCounts(taskService.totalNonCompletedTasks(project.getProjectCode()));
-            return dto;
-        }).collect(Collectors.toList());
+        List<Project> list = projectRepository.findAllByAssignedManager(user);
+
+
+        return list.stream().map(project -> {
+
+                    ProjectDTO obj = projectMapper.convertToDto(project);
+
+                    obj.setUnfinishedTaskCounts(taskService.totalNonCompletedTask(project.getProjectCode()));
+                    obj.setCompleteTaskCounts(taskService.totalCompletedTask(project.getProjectCode()));
+
+                    return obj;
+                }
+
+        ).collect(Collectors.toList());
     }
 
     @Override
-    public List<ProjectDTO> listAllNonCompletedByAssignedManager(UserDTO userDTO) {
-        List<Project> projects=projectRepository
-                .findAllByProjectStatusIsNotAndAssignedManager(Status.COMPLETE,userMapper.convertToEntity(userDTO));
-
+    public List<ProjectDTO> listAllNonCompletedByAssignedManager(UserDTO assignedManager) {
+        List<Project> projects = projectRepository
+                .findAllByProjectStatusIsNotAndAssignedManager(Status.COMPLETE, userMapper.convertToEntity(assignedManager));
         return projects.stream().map(projectMapper::convertToDto).collect(Collectors.toList());
     }
+
 }

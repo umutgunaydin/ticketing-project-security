@@ -10,6 +10,7 @@ import com.company.service.ProjectService;
 import com.company.service.TaskService;
 import com.company.service.UserService;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,7 @@ public class UserServiceImpl implements UserService {
     private final TaskService taskService;
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, @Lazy ProjectService projectService, @Lazy TaskService taskService, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, ProjectService projectService, TaskService taskService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.projectService = projectService;
@@ -35,58 +36,71 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDTO> listAllUsers() {
-
         List<User> userList = userRepository.findAllByIsDeletedOrderByFirstNameDesc(false);
-        List<UserDTO> userDTOList = userList.stream().map(userMapper::convertToDto).collect(Collectors.toList());
-        return userDTOList;
+        return userList.stream().map(userMapper::convertToDto).collect(Collectors.toList());
     }
 
     @Override
     public UserDTO findByUserName(String username) {
-        return userMapper.convertToDto(userRepository.findByUserNameAndIsDeleted(username,false));
+        User user = userRepository.findByUserNameAndIsDeleted(username, false);
+        return userMapper.convertToDto(user);
     }
 
     @Override
     public void save(UserDTO user) {
+
         user.setEnabled(true);
-        User entity = userMapper.convertToEntity(user);
-        entity.setPassword(passwordEncoder.encode(entity.getPassword()));
-        userRepository.save(entity);
+
+        User obj = userMapper.convertToEntity(user);
+        obj.setPassWord(passwordEncoder.encode(obj.getPassWord()));
+
+        userRepository.save(obj);
+
     }
 
 //    @Override
 //    public void deleteByUserName(String username) {
+//
 //        userRepository.deleteByUserName(username);
 //    }
 
     @Override
-    public UserDTO update(UserDTO userDTO) {
-        User user1=userRepository.findByUserNameAndIsDeleted(userDTO.getUserName(),false);
-        User convertedUser=userMapper.convertToEntity(userDTO);
+    public UserDTO update(UserDTO user) {
+
+        //Find current user
+        User user1 = userRepository.findByUserNameAndIsDeleted(user.getUserName(), false);  //has id
+        //Map update user dto to entity object
+        User convertedUser = userMapper.convertToEntity(user);   // has id?
+        //set id to the converted object
         convertedUser.setId(user1.getId());
+        //save the updated user in the db
         userRepository.save(convertedUser);
 
-        return findByUserName(userDTO.getUserName());
+        return findByUserName(user.getUserName());
+
     }
 
     @Override
     public void delete(String username) {
 
-        User user = userRepository.findByUserNameAndIsDeleted(username,false);
+        User user = userRepository.findByUserNameAndIsDeleted(username, false);
+
         if (checkIfUserCanBeDeleted(user)) {
             user.setIsDeleted(true);
-            user.setUserName(user.getUserName() + "-" + user.getId());
+            user.setUserName(user.getUserName() + "-" + user.getId());  // harold@manager.com-2
             userRepository.save(user);
         }
+
     }
 
     @Override
     public List<UserDTO> listAllByRole(String role) {
-        List<User> users = userRepository.findByRoleDescriptionIgnoreCaseAndIsDeleted(role,false);
+        List<User> users = userRepository.findByRoleDescriptionIgnoreCaseAndIsDeleted(role, false);
         return users.stream().map(userMapper::convertToDto).collect(Collectors.toList());
     }
 
     private boolean checkIfUserCanBeDeleted(User user) {
+
         switch (user.getRole().getDescription()) {
             case "Manager":
                 List<ProjectDTO> projectDTOList = projectService.listAllNonCompletedByAssignedManager(userMapper.convertToDto(user));
@@ -97,5 +111,7 @@ public class UserServiceImpl implements UserService {
             default:
                 return true;
         }
+
     }
+
 }

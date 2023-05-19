@@ -36,10 +36,10 @@ public class UserDTO {
 
     @NotBlank
     @Pattern(regexp = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{4,}")
-    private String password;
+    private String passWord;
 
     @NotNull
-    private String confirmPassword;
+    private String confirmPassWord;
 
     private boolean enabled;
 
@@ -53,29 +53,29 @@ public class UserDTO {
     @NotNull
     private Gender gender;
 
-    public String getPassword() {
-        return password;
+    public String getPassWord() {
+        return passWord;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassWord(String passWord) {
+        this.passWord = passWord;
         checkConfirmPassword();
     }
 
-    public String getConfirmPassword() {
-        return confirmPassword;
+    public String getConfirmPassWord() {
+        return confirmPassWord;
     }
 
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
+    public void setConfirmPassWord(String confirmPassWord) {
+        this.confirmPassWord = confirmPassWord;
         checkConfirmPassword();
     }
 
     private void checkConfirmPassword() {
-        if (this.password == null || this.confirmPassword == null) {
+        if (this.passWord == null || this.confirmPassWord == null) {
             return;
-        } else if (!this.password.equals(this.confirmPassword)) {
-            this.confirmPassword = null;
+        } else if (!this.passWord.equals(this.confirmPassWord)) {
+            this.confirmPassWord = null;
         }
     }
 

@@ -7,15 +7,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@SpringBootApplication //includes @Configuration//
-public class TicketingProjectSecurityApplication {//
+@SpringBootApplication  //this includes @Configuration
+public class TicketingProjectSecurityApplication {
 
     public static void main(String[] args) {
+
         SpringApplication.run(TicketingProjectSecurityApplication.class, args);
     }
 
     @Bean
-    public ModelMapper mapper() {
+    public ModelMapper mapper(){
+
         return new ModelMapper();
     }
 

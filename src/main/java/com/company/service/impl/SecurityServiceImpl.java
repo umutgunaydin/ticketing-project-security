@@ -20,12 +20,14 @@ public class SecurityServiceImpl implements SecurityService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        User user=userRepository.findByUserNameAndIsDeleted(username,false);
+        User user = userRepository.findByUserNameAndIsDeleted(username,false);
 
-        if (user==null){
+        if(user==null){
             throw new UsernameNotFoundException(username);
         }
 
-        return new UserPrincipal(user);   //get user from db convert to what spring understands by using UserPrincipal class
+
+        return new UserPrincipal(user);  //get the user from db,and convert to user springs understands by using userprincipal
+
     }
 }

@@ -26,56 +26,65 @@ public class UserController {
     public String createUser(Model model){
 
         model.addAttribute("user", new UserDTO());
-        model.addAttribute("roles",roleService.listAllRoles());
-        model.addAttribute("users",userService.listAllUsers());
+        model.addAttribute("roles", roleService.listAllRoles());
+        model.addAttribute("users", userService.listAllUsers());
 
         return "/user/create";
+
     }
 
     @PostMapping("/create")
-    public String insertUser(@Valid @ModelAttribute("user") UserDTO user, BindingResult bindingResult, Model model){
+    public String insertUser(@Valid @ModelAttribute("user") UserDTO user, BindingResult bindingResult, Model model) {
 
-        if (bindingResult.hasErrors()){
-            model.addAttribute("roles",roleService.listAllRoles());
-            model.addAttribute("users",userService.listAllUsers());
+        if (bindingResult.hasErrors()) {
+
+            model.addAttribute("roles", roleService.listAllRoles());
+            model.addAttribute("users", userService.listAllUsers());
+
             return "/user/create";
+
         }
 
         userService.save(user);
 
         return "redirect:/user/create";
+
     }
 
     @GetMapping("/update/{username}")
-    public String editUser(@PathVariable("username") String username, Model model){
+    public String editUser(@PathVariable("username") String username, Model model) {
 
         model.addAttribute("user", userService.findByUserName(username));
-        model.addAttribute("roles",roleService.listAllRoles());
-        model.addAttribute("users",userService.listAllUsers());
-
+        model.addAttribute("roles", roleService.listAllRoles());
+        model.addAttribute("users", userService.listAllUsers());
 
         return "/user/update";
+
     }
 
     @PostMapping("/update")
-    public String updateUser(@Valid @ModelAttribute("user") UserDTO user, BindingResult bindingResult, Model model){ // without using @ModelAttribute it is ok
+    public String updateUser(@Valid @ModelAttribute("user") UserDTO user, BindingResult bindingResult, Model model) {
 
-        if (bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
+
             model.addAttribute("roles", roleService.listAllRoles());
             model.addAttribute("users", userService.listAllUsers());
+
+            return "/user/update";
+
         }
+
         userService.update(user);
 
         return "redirect:/user/create";
+
     }
 
     @GetMapping("/delete/{username}")
-    public String deleteUser(@PathVariable("username") String username, Model model){
-
+    public String deleteUser(@PathVariable("username") String username) {
+//        userService.deleteByUserName(username);
         userService.delete(username);
-
         return "redirect:/user/create";
     }
-
 
 }
