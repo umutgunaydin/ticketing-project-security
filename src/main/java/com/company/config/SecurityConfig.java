@@ -18,6 +18,7 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
+// manual user creation ***
 //    @Bean
 //    public UserDetailsService userDetailsService(PasswordEncoder encoder) {
 //
@@ -35,11 +36,11 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeRequests()
-//                .antMatchers("/user/**").hasRole("ADMIN")
+//                .antMatchers("/user/**").hasRole("ADMIN") //means ROLE_ADMIN -- uses prefix of ROLE_
                 .antMatchers("/user/**").hasAuthority("Admin")
-//                .antMatchers("/task/**").hasRole("MANAGER")
-//                .antMatchers("/task/employee/**").hasRole("EMPLOYEE")
-//                .antMatchers("/task/**").hasAnyRole("EMPLOYEE","ADMIN")
+                .antMatchers("/project/**").hasAuthority("Manager")
+                .antMatchers("/task/employee/**").hasAuthority("Employee")
+                .antMatchers("/task/**").hasAuthority("Manager")
 //                .antMatchers("/task/**").hasAuthority("ROLE_EMPLOYEE")
                 .antMatchers(
                         "/",
